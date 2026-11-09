@@ -1,0 +1,89 @@
+from sqlalchemy import ForeignKey,DateTime
+from sqlalchemy import String,Integer,Float,Date
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
+from datetime import datetime,date
+
+
+
+
+class Base(DeclarativeBase):
+     pass
+class TimestampMixin:
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda:datetime.now())
+
+
+
+class User(Base):
+    __tablename__='users'
+
+    id : Mapped[int]=mapped_column(Integer,primary_key=True)
+    full_name:Mapped[str]=mapped_column(String(100))
+    email:Mapped[str]=mapped_column(String(100),unique=True)
+    password:Mapped[str]=mapped_column(String(100))
+
+
+
+
+class Product(Base):
+    __tablename__='products'
+
+    id : Mapped[int]=mapped_column(Integer,primary_key=True)
+    user_id:Mapped[int]=mapped_column(ForeignKey('users.id'))
+    product_name:Mapped[str]=mapped_column(String)
+    buying_price : Mapped[float]=mapped_column(Float)
+    selling_price : Mapped[float]=mapped_column(Float)
+
+
+
+
+class Sale(Base):
+    __tablename__='sales'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    user_id:Mapped[int]=mapped_column(Integer,ForeignKey('users.id'))
+    product_id:Mapped[int]=mapped_column(Integer,ForeignKey('products.id'))
+    date_sold:Mapped[date]=mapped_column(Date, default=lambda:datetime.now().date())
+    product:Mapped[Product]=relationship()
+    payment:Mapped["Payment"]=relationship(back_populates='sale' ,uselist=False)
+
+
+
+
+
+class Payment(Base,TimestampMixin):
+    __tablename__='payments'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    sale_id:Mapped[int]=mapped_column(Integer,ForeignKey('sales.id'))
+    # date_paid:Mapped[date]=mapped_column(Date)
+    amount:Mapped[float]=mapped_column(Float)
+    transaction_code:Mapped[str]=mapped_column(String,nullable=True,default=None)
+    mrid:Mapped[str]=mapped_column(String)
+    crid:Mapped[str]=mapped_column(String)
+    status:Mapped[str]=mapped_column(String,default='pending')
+    phone_number:Mapped[str]=mapped_column(String)
+    sale:Mapped[Sale]=relationship(back_populates='payment')
+
+
+
+
+class Purchase(Base):
+    __tablename__='purchases'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    product_id:Mapped[int]=mapped_column(Integer,ForeignKey('products.id'))
+    purchase_price :  Mapped[Float] = mapped_column(Float)
+    date_purchased:Mapped[date]=mapped_column(Date)
+
+
+
+
+class Sale_detail(Base):
+    __tablename__='sales_details'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    product_id:Mapped[int]=mapped_column(Integer,ForeignKey('products.id'))
+    sale_id:Mapped[int]=mapped_column(Integer,ForeignKey('sales.id'))
+    quantity:Mapped[float]=mapped_column(Float)
+    amount:Mapped[int]=mapped_column(Integer)
+    
+
