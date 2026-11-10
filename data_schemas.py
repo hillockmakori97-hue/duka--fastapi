@@ -13,3 +13,9 @@ class ProductResponse(BaseModel):
     buying_price:float
     selling_price:float
     stock_quantity:int
+
+
+class UserRequest(BaseModel):
+    full_name:str
+    email:str
+    password:str
