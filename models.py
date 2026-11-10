@@ -35,7 +35,7 @@ class Product(Base):
     product_name:Mapped[str]=mapped_column(String)
     buying_price : Mapped[float]=mapped_column(Float)
     selling_price : Mapped[float]=mapped_column(Float)
-
+    stock_quantity: Mapped[int]=mapped_column(Integer)
 
 
 

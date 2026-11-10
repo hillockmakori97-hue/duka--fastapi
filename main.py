@@ -4,13 +4,13 @@ from data_schemas import ProductRequest,ProductResponse
 
 from sqlalchemy import create_engine, select,insert
 from models import Base, Product, Purchase, User, Sale, Sale_detail, Payment
-from fastapi import FastAPI
+
 
 
 
 app = FastAPI()
 # Create a database using sqlalchemy engine
-engine = create_engine("sqlite:///./flask_duka_api.db", echo=True)
+engine = create_engine("sqlite:///./duka-fast-api", echo=True)
 
 # Create tables into the database using sqlalchemy
 Base.metadata.create_all(engine)
@@ -20,8 +20,8 @@ session = Session(engine)
 
 
 @app.get("/")
-def read_root():
-    return {"Hello": "World"}
+def home():
+    return {'Version': "World"}
 
 
 # @app.get("/items/{item_id}")
@@ -31,10 +31,12 @@ def read_root():
 @app.post('/products')
 def create_product(prod:ProductRequest):
     new_product=Product(
-        user_id=1,
+        user_id=prod.user_id,
         product_name=prod.name,
         buying_price =prod.buying_price,
-        selling_price=prod.selling_price
+        selling_price=prod.selling_price,
+        stock_quantity=prod.stock_quantity
     )
     session.add(new_product)
-    return{'test':'prod'}
+    session.commit()
+    return{'new_product':new_product}
