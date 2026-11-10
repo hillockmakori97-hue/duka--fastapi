@@ -7,9 +7,9 @@ class ProductRequest(BaseModel):
     stock_quantity:int
 
 class ProductResponse(BaseModel):
-    id : int 
+    id:int
     user_id: int
-    name : str
+    product_name : str
     buying_price:float
     selling_price:float
     stock_quantity:int

@@ -28,7 +28,7 @@ def home():
 # def read_item(item_id: int, q: str):
 #     return {"item_id": item_id, "q": q}
 
-@app.post('/products')
+@app.post('/products', response_model=ProductResponse)
 def create_product(prod:ProductRequest):
     new_product=Product(
         user_id=prod.user_id,
@@ -39,7 +39,7 @@ def create_product(prod:ProductRequest):
     )
     session.add(new_product)
     session.commit()
-    return{'new_product':new_product}
+    return new_product
 
 @app.post('/register')
 def add_user(user:UserRequest):
@@ -57,3 +57,9 @@ def add_user(user:UserRequest):
         return{'Success':'User added succesfully'}
     else:
         return{'Error':'Error Occured'}
+
+@app.get('/products',response_model=list[ProductResponse])
+def get_products():
+    query=select(Product)
+    products=session.scalars(query)
+    return products
