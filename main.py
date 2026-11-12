@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from sqlalchemy.orm import Session
-from data_schemas import ProductRequest,ProductResponse,UserRequest
+from data_schemas import ProductRequest,ProductResponse,UserRequest,PurchaseRequest,PurchaseResponse,SalesRequest,SaleDetailRequest,SalesResponse,SaleDetailResponse,PaymentRequest,PaymentResponse
 
 from sqlalchemy import create_engine, select,insert
 from models import Base, Product, Purchase, User, Sale, Sale_detail, Payment
-
+from datetime import datetime,date
 
 
 
@@ -67,7 +67,76 @@ def get_products():
     return products
 
 
+@app.get('/purchases',response_model=list[PurchaseResponse])
+def get_purchases():
+    query=select(Purchase)
+    purchases=session.scalars(query)
+    return purchases
 
 
 
+@app.post('/purchases',response_model=PurchaseResponse)
+def post_purchases(prse:PurchaseRequest):
+    new_purchase=Purchase(
+        product_id=prse.product_id,
+        purchase_price=prse.purchase_price,
+        date_purchased=datetime.now().date()
+        
+    )
+    session.add(new_purchase)
+    session.commit()
+    return new_purchase
 
+@app.get('/sales',response_model=list[SalesResponse])
+def get_sales():
+    query=select(Sale)
+    sales=session.scalars(query)
+    return sales
+
+
+@app.post('/sales',response_model=SalesResponse)
+def post_sales(sale:SalesRequest):
+    new_sale=Sale(
+        user_id=sale.user_id,
+        product_id=sale.product_id,
+        date_sold=datetime.now().date(),
+        # product=sale.product,
+        # payment=sale.payment
+    )
+    session.add(new_sale)
+    session.commit()
+    return new_sale
+
+
+@app.get('/sale-details', response_model=list[SaleDetailResponse])
+def get_sale_details():
+    query = select(Sale_detail)
+    sale_details = session.scalars(query).all()
+    return sale_details
+
+@app.post('/sale-details', response_model=SaleDetailResponse)
+def post_sale_detail(detail: SaleDetailRequest):
+    new_detail = Sale_detail(
+        product_id=detail.product_id,
+        sale_id=detail.sale_id,
+        quantity=detail.quantity,
+        amount=detail.amount
+    )
+    session.add(new_detail)
+    session.commit()
+    session.refresh(new_detail)
+    return new_detail
+@app.post("/payments", response_model=PaymentResponse)
+def create_payment(payment: PaymentRequest):
+    dbpayment = Payment(
+        sale_id=payment.sale_id,
+        amount=payment.amount,
+        transaction_code=payment.transaction_code,
+        mrid=payment.mrid,
+        crid=payment.crid,
+        status=payment.payment_status,
+        phone_number=payment.phone_number
+    )
+    session.add(dbpayment)
+    session.commit()
+    return dbpayment
