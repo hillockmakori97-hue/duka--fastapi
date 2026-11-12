@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,HTTPException
 from sqlalchemy.orm import Session
 from data_schemas import ProductRequest,ProductResponse,UserRequest,PurchaseRequest,PurchaseResponse,SalesRequest,SaleDetailRequest,SalesResponse,SaleDetailResponse,PaymentRequest,PaymentResponse
 
@@ -44,7 +44,7 @@ def home():
 #     return{'Success':'User added succesfully'}
 # add_user()
 
-
+# products route
 
 @app.post('/products', response_model=ProductResponse)
 def create_product(prod:ProductRequest):
@@ -66,7 +66,41 @@ def get_products():
     products=session.scalars(query)
     return products
 
+@app.put('/products/{product_id}',response_model=ProductResponse)
+def update_product(product_id : int,prod:ProductRequest):
+    query = select(Product).where(Product.id == product_id)
+    product=session.scalars(query).first()
 
+    if product is None:
+        raise HTTPException(
+            status_code=404,detail='product not found'
+        )
+
+    product.product_name=prod.name
+    product.buying_price=prod.buying_price
+    product.selling_price=prod.selling_price
+    product.stock_quantity=prod.stock_quantity
+    session.commit()
+    return product
+
+@app.get("/products/{product_id}", response_model=ProductResponse)
+def get_single_product(product_id):
+    query = select(Product).where(Product.id == product_id)
+    product = session.scalars(query).first()
+    
+    if product is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Product not found"
+        )
+    return product
+
+# end of products route 
+
+
+
+
+# --------------------- Purchase routes
 @app.get('/purchases',response_model=list[PurchaseResponse])
 def get_purchases():
     query=select(Purchase)
@@ -86,6 +120,11 @@ def post_purchases(prse:PurchaseRequest):
     session.add(new_purchase)
     session.commit()
     return new_purchase
+
+# ---------------end of purchases------------
+
+
+# -----------------sale routes ----------
 
 @app.get('/sales',response_model=list[SalesResponse])
 def get_sales():
@@ -107,6 +146,10 @@ def post_sales(sale:SalesRequest):
     session.commit()
     return new_sale
 
+# ================== end of sale routes =========================
+
+# ========================sale detail routes ==================
+
 
 @app.get('/sale-details', response_model=list[SaleDetailResponse])
 def get_sale_details():
@@ -126,6 +169,11 @@ def post_sale_detail(detail: SaleDetailRequest):
     session.commit()
     session.refresh(new_detail)
     return new_detail
+
+# =============================end of sale detail routes ========================
+
+
+
 @app.post("/payments", response_model=PaymentResponse)
 def create_payment(payment: PaymentRequest):
     dbpayment = Payment(
@@ -140,3 +188,5 @@ def create_payment(payment: PaymentRequest):
     session.add(dbpayment)
     session.commit()
     return dbpayment
+
+
