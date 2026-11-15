@@ -1,5 +1,5 @@
 [project]
-name = "duka-fast-api"
+name = "duka-fastapi"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -8,13 +8,13 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi[standard]>=0.162.0",
+    "fastapi[standard]>=0.163.1",
     "sqlalchemy>=2.1.8",
 ]
 
 [project.scripts]
-duka-fast-api = "duka_fast_api:main"
+duka-fastapi = "duka_fastapi:main"
 
 [build-system]
-requires = ["uv_build>=0.13.7,<0.14.0"]
+requires = ["uv_build>=0.13.8,<0.14.0"]
 build-backend = "uv_build"

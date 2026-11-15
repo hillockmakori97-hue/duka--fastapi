@@ -1,6 +1,6 @@
 from fastapi import FastAPI,HTTPException
 from sqlalchemy.orm import Session
-from data_schemas import ProductRequest,ProductResponse,UserRequest,PurchaseRequest,PurchaseResponse,SalesRequest,SaleDetailRequest,SalesResponse,SaleDetailResponse,PaymentRequest,PaymentResponse
+from data_schemas import ProductRequest,SalesPut,ProductResponse,UserRequest,PurchaseRequest,PurchaseResponse,SalesRequest,SaleDetailRequest,SalesResponse,SaleDetailResponse,PaymentRequest,PaymentResponse
 
 from sqlalchemy import create_engine, select,insert
 from models import Base, Product, Purchase, User, Sale, Sale_detail, Payment
@@ -132,6 +132,25 @@ def get_sales():
     sales=session.scalars(query)
     return sales
 
+@app.put("/sales/{sale_id}",response_model=SalesResponse)
+def update_sale(sale_id : int,sale_edit:SalesPut):
+    query=select(Sale).where(Sale.id==sale_id)
+    sale=session.scalars(query).first()
+
+    if sale is None:
+        raise HTTPException(
+            status_code=404,
+            detail='Sale not found'
+        )
+    
+    sale.user_id=sale_edit.user_id
+    sale.product_id=sale_edit.product_id
+    sale.date_sold=sale_edit.date_sold
+    session.commit()
+    return sale
+
+
+    
 
 @app.post('/sales',response_model=SalesResponse)
 def post_sales(sale:SalesRequest):

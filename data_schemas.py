@@ -30,6 +30,13 @@ class SalesRequest(BaseModel):
     product: int
     payment:float
 
+class SalesPut(BaseModel):
+    user_id:int
+    product_id:int
+    date_sold: date
+    model_config = ConfigDict(from_attributes=True)
+
+
 class SalesResponse(BaseModel):
     id:int
     user_id:int
