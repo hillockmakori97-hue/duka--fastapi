@@ -121,6 +121,35 @@ def post_purchases(prse:PurchaseRequest):
     session.commit()
     return new_purchase
 
+@app.put('/purchase/{purchase_id}',response_model=PurchaseResponse)
+def update_purchase(purchase_id : int ,prse:PurchaseRequest):
+    query=select(Purchase).where(Purchase.id==purchase_id)
+    purchase=session.scalars(query).first()
+    purchase.product_id=prse.product_id
+    purchase.purchase_price=prse.purchase_price
+    purchase.date_sold=prse.date_purchased 
+    session.commit()
+
+    if purchase is None:
+        raise HTTPException(
+            status_code=404,
+            detail='Purchase Not Found'
+        )
+    return purchase
+
+
+@app.get('/purchases/{purchase_id}',response_model=PurchaseResponse)
+def get_specific_purchase(purchase_id:int,prse:PurchaseRequest):
+    query=select(Purchase).where(Purchase.id==purchase_id)
+    purchase=session.scalars(query).first()
+
+    if purchase is None:
+        raise HTTPException(
+            status_code=404,
+            detail='Purchase Not Found'
+        )
+    return purchase
+
 # ---------------end of purchases------------
 
 
@@ -149,8 +178,16 @@ def update_sale(sale_id : int,sale_edit:SalesPut):
     session.commit()
     return sale
 
-
-    
+@app.get('/sales/{sale_id}',response_model=SalesResponse)
+def get_specific_sale(sale_id):
+    query=select(Sale).where(Sale.id==sale_id)
+    sale=session.scalars(query).first()
+    if sale is None:
+        raise HTTPException(
+            status_code=404,
+            detail='Sale Not Found'
+        )
+    return sale
 
 @app.post('/sales',response_model=SalesResponse)
 def post_sales(sale:SalesRequest):
@@ -189,6 +226,35 @@ def post_sale_detail(detail: SaleDetailRequest):
     session.refresh(new_detail)
     return new_detail
 
+@app.put('/sale-detail/{sale_detail_id}',response_model=SaleDetailResponse)
+def update_sale_detail(sale_detail_id : int, s_detail:SaleDetailRequest):
+    query=select(Sale_detail).where(Sale_detail.id==sale_detail_id)
+    sale_detail=session.scalars(query).first()
+    if sale_detail is None:
+        raise HTTPException(
+            status_code=404,
+            detail='Sale-Detail Not Found'
+        )
+    sale_detail.product_id=s_detail.product_id
+    sale_detail.sale_id=s_detail.sale_id
+    sale_detail.quantity=s_detail.quantity
+    sale_detail.amount=s_detail.amount
+    session.commit()
+    return sale_detail
+
+
+@app.get('/sale-detail/{sale_detail_id}',response_model=SaleDetailResponse)
+def get_specific_sale_detail(sale_detail_id):
+    query=select(Sale_detail).where(Sale_detail.id==sale_detail_id)
+    s_detail=session.scalars(query).first()
+    if s_detail is None:
+        raise HTTPException(
+            status_code=404,
+            detail='Item not found'
+        )
+    return s_detail
+
+    
 # =============================end of sale detail routes ========================
 
 

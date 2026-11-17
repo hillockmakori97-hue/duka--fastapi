@@ -50,7 +50,7 @@ class SalesResponse(BaseModel):
 class PurchaseRequest(BaseModel):
     product_id:int
     purchase_price:int
-    date_purchased:int 
+    date_purchased:date
 
 
 class PurchaseResponse(BaseModel):
