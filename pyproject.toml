@@ -9,6 +9,8 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.163.1",
+    "pwdlib[argon2]>=0.4.2",
+    "pyjwt>=2.15.1",
     "sqlalchemy>=2.1.8",
 ]
 
